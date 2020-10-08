@@ -1,0 +1,6 @@
+MODEL_TYPE,NODE_TYPE,ID,NAME,PARENT_ID,LEVEL_NUM
+Entitlements,Entitlements_Node,1,Entitlements_core_node,,0
+Entitlements,Billing_Node,2,Tariff_1,1,1
+Entitlements,Tier,13,Tier_1,1,1
+Entitlements,PPV_Channel,7,Sport,2:13,2
+Entitlements,PPV_Channel,8,Documentary,2:13,2

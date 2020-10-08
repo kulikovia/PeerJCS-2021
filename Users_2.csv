@@ -1,0 +1,8 @@
+MODEL_TYPE,NODE_TYPE,ID,NAME,PARENT_ID,LEVEL_NUM
+User,User_Group,1,User_core_node,,0
+User,User_Group,2,Tariff_1,1,1
+User,User,7,User_1,2,2
+User,User,12,User_6,2,2
+User,STB,32,STB_1,7,3
+User,STB,37,STB_6,12,3
+
