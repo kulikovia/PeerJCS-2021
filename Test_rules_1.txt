@@ -1,0 +1,19 @@
+Hierarchical model rules.
+
+Billing,User,X,User_X,Y:Z   X - 12-max, Y - 2-6, Z - 7-11
+
+PPV,PPV_Event,X,Event_X,Y   X - 19-max, Y - 9-18
+
+User,User,X,User_X,Y   X - 7-max, Y - 2-6
+
+User,STB,X,STB_Y,Z     X - maxUser+1 - max, Y - 1-max, Z - 7-maxUser
+
+One-level model rules.
+      
+Billing,User,X,User_X,Y:Z   X - 0-max, Y - NULL, Z - NULL
+
+PPV,PPV_Event,X,Event_X,Y   X - 0-max, Y - NULL
+
+User,User,X,User_X,Y   X - 0-max, Y - NULL
+
+User,STB,X,STB_Y,Z     X - maxUser+1 - max, Y - 1-max, Z - 0-maxUser
