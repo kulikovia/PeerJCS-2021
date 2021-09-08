@@ -1,5 +1,0 @@
-MODEL_TYPE,NODE_TYPE,ID,NAME,PARENT_ID,LEVEL_NUM
-Billing,Billing_Node,1,Billing_core_node,,0
-Billing,Billing_Node,2,Tariff_1,1,1
-Billing,Tier,32,Tier_1,1,1
-Billing,User,7,User_1,2:32,2
