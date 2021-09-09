@@ -1,7 +1,0 @@
-MODEL_TYPE,NODE_TYPE,ID,NAME,PARENT_ID,LEVEL_NUM
-Services,Service,1,Services_core_node,,0
-Services,Service,2,PPV,1,1
-Services,Service,3,Watch_TV,1,1
-Services,Service,4,VOD,1,1
-Services,Service,5,Time_shift,1,1
-Services,Service,6,DVR,1,1
