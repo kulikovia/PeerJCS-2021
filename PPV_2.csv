@@ -1,6 +1,0 @@
-MODEL_TYPE,NODE_TYPE,ID,NAME,PARENT_ID,LEVEL_NUM
-PPV,PPV_Channel,1,PPV_calaloge_Core,,0
-PPV,PPV_Channel,5,Sport,1,1
-PPV,PPV_Channel,6,Children,1,1
-PPV,PPV_Event,19,Event_1,5,2
-PPV,PPV_Event,22,Event_4,6,2
