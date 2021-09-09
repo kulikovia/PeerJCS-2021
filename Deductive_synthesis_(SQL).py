@@ -10,7 +10,7 @@ con = psycopg2.connect(
    user="postgres",
    password="admin",
    host="127.0.0.1",
-   port="5432"
+   port="5433"
     )
 #Clear DB tables
 cur = con.cursor()
@@ -188,7 +188,7 @@ def deductive_synthesis(model, facts):
             goals[k].node_id = row[4]
             test.append(str(datetime.now()) + " - Goal achieved. Goal ID: " + str(goals[k].goal_id) + " Level num: " + str(
                 goals[k].level_num) + " Node ID: " + str(goals[k].node_id))
-            print(test[k])
+            #print(test[k])
             k = k + 1
             i = i + 1
             num = num + 1

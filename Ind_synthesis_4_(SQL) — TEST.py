@@ -27,7 +27,7 @@ con = psycopg2.connect(
    user="postgres",
    password="admin",
    host="127.0.0.1",
-   port="5432"
+   port="5433"
     )
 #Clear DB tables
 print("Connected to DB")
@@ -420,9 +420,9 @@ if __name__ == "__main__":
     t1 = int(time.time() * 1000)
     print("Indexes normalized. Time: " + str(t1-t0) + " ms.")
     # Base links creation - hierarchical
-    base_obj.create_base_links('Links_rules.csv')
+    #base_obj.create_base_links('Links_rules.csv')
     # Base links creation - one-level
-    #base_obj.create_base_links('Links_rules-one-level-TEST.csv')
+    base_obj.create_base_links('Links_rules-one-level-TEST.csv')
     t0 = t1
     t1 = int(time.time() * 1000)
     print("Base links created. Time: " + str(t1-t0) + " ms.")

@@ -3,7 +3,7 @@ import numpy as np
 import random
 
 def create_model():
-    num_users = 249000
+    num_users = 99000
     num_ppv = 1000
     # Open csv file
     model_csv = open("Test_model.csv", "wt")
