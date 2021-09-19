@@ -185,3 +185,22 @@ TABLESPACE pg_default;
 
 ALTER TABLE public."Temp_table2"
     OWNER to postgres;
+	
+-- Table: public.Facts_processed
+
+-- DROP TABLE public."Facts_processed";
+
+CREATE TABLE IF NOT EXISTS public."Facts_processed"
+(
+    "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
+    "FACT_ID" text COLLATE pg_catalog."default",
+    "LEVEL_NUM" bigint,
+    "isAchieved" bigint,
+    "CONTROL_DATE" timestamp with time zone,
+    CONSTRAINT "Facts_processed_pkey" PRIMARY KEY ("ID")
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public."Facts_processed"
+    OWNER to postgres;

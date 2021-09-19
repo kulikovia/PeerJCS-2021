@@ -20,6 +20,7 @@ con = psycopg2.connect(
 cur = con.cursor()
 cur.execute('''TRUNCATE TABLE public."Facts";''')
 cur.execute('''TRUNCATE TABLE public."Req_model";''')
+cur.execute('''TRUNCATE TABLE public."Facts_processed";''')
 con.commit()
 
 
@@ -53,7 +54,7 @@ class facts_model:
     def start(self, file_name, model1):
         model = []
         with open(file_name) as f_obj:
-            csv_dict_reader_facts(f_obj, model)
+            csv_dict_reader_facts_and_req_model(f_obj, model)
         self.model1 = model
 
 class base_node:
@@ -133,7 +134,7 @@ def csv_dict_reader_models(file_obj, model):
         i = i+1
     return model
 
-def csv_dict_reader_facts(file_obj_rules, model):
+def csv_dict_reader_facts_and_req_model(file_obj_rules, model):
     """
     Read a CSV file using csv.DictReader
     """
@@ -149,81 +150,64 @@ def csv_dict_reader_facts(file_obj_rules, model):
         model[i].parent_id = line["PARENT_ID"]
         model[i].level_num = line["LEVEL_NUM"]
         i = i+1
-    sql = '''COPY "Facts" ("MODEL_TYPE", "NODE_TYPE", "FACT_ID", "NAME", "PARENT_ID", "LEVEL_NUM") FROM 'C:\Blazegraph\Projects\Test_facts1.csv' WITH DELIMITER ',' CSV HEADER;'''
+    t0 = float(time.time() * 1000)
+    #Set of facts importing
+    #sql = '''COPY "Facts" ("MODEL_TYPE", "NODE_TYPE", "FACT_ID", "NAME", "PARENT_ID", "LEVEL_NUM") FROM 'C:\Blazegraph\Projects\Test_facts1.csv' WITH DELIMITER ',' CSV HEADER;'''
+    # Single fact importing
+    sql = '''COPY "Facts" ("MODEL_TYPE", "NODE_TYPE", "FACT_ID", "NAME", "PARENT_ID", "LEVEL_NUM") FROM 'C:\Blazegraph\Projects\Test_one_facts1.csv' WITH DELIMITER ',' CSV HEADER;'''
     cur.execute(sql)
     con.commit()
-    return model
-
-def deductive_synthesis(model, facts, level_num):
+    print(datetime.now(), " - Set of facts has been imported")
+    t1 = float(time.time() * 1000)
+    print(datetime.now(), " - Facts import time: " + str(t1 - t0) + "ms.")
+    t02 = float(time.time() * 1000)
     sql = '''COPY "Req_model" ("ID", "MODEL_TYPE", "NODE_TYPE", "SRC_ID", "NAME", "PARENT_ID", "LEVEL_NUM") FROM 'C:\Blazegraph\Projects\Req_model_1.csv' WITH DELIMITER ',' CSV HEADER;'''
     cur.execute(sql)
     con.commit()
     print(datetime.now(), ' - The rules readed')
+    t12 = float(time.time() * 1000)
+    print(datetime.now(), " - Rules reading time: " + str(t12 - t02) + "ms.")
+    #Process the set of facts
+    t03 = float(time.time() * 1000)
+    sql = '''INSERT INTO public."Facts_processed" ("FACT_ID", "LEVEL_NUM","isAchieved","CONTROL_DATE")
+                    SELECT d."FACT_ID", s."LEVEL_NUM", 1, current_timestamp FROM public."Req_model" as s JOIN public."Facts" as d 
+                        ON s."MODEL_TYPE" = d."MODEL_TYPE" 
+                        AND s."NODE_TYPE" = d."NODE_TYPE"
+                        AND s."NAME" = d."NAME"
+                        AND s."SRC_ID" = d."FACT_ID"
+                        WHERE s."LEVEL_NUM" = ''' + str(level_num) + ''';'''
+    cur.execute(sql)
+    con.commit()
+    print(datetime.now(), ' - The current factes have been processed')
+    t13 = float(time.time() * 1000)
+    print(datetime.now(), " - Facts processing time: " + str(t13 - t03) + "ms.")
+    return model
+
+def deductive_synthesis(model, facts, level_num):
     num = 0
-    goals = []
-    test = []
     max_level = 0
-    print(datetime.now(), ' - The rules applied')
-    print(datetime.now(), ' - The rules red')
-    print(datetime.now(), ' - The deductive model proving started')
     for i in range(len(model)):
         if max_level < int(model[i].level_num):
             max_level = int(model[i].level_num)
     print(datetime.now(), ' - The model Max_level= ', max_level)
-    k = 0
-    i = 0
-    l = 0
 
-    sql = '''SELECT s."ID", s."LEVEL_NUM", s."MODEL_TYPE", s."NODE_TYPE", s."SRC_ID" FROM public."Req_model" as s JOIN public."Facts" as d 
-                    ON s."MODEL_TYPE" = d."MODEL_TYPE" 
-                    AND s."NODE_TYPE" = d."NODE_TYPE"
-                    AND s."NAME" = d."NAME"
-                    AND s."SRC_ID" = d."FACT_ID"
-                    WHERE s."LEVEL_NUM" = ''' + str(level_num) +''';'''
+    sql = '''SELECT count(s."isAchieved") FROM public."Facts_processed" as s
+                WHERE "LEVEL_NUM" = ''' + str(level_num) + '''AND "isAchieved" = 1;'''
+
     cur.execute(sql)
     con.commit()
-    rows = cur.fetchall()
-    #print(sql)
-    for row in rows:
-        goals.append(goal())
-        goals[k].goal_id = row[0]
-        goals[k].goal_desc = "Goal achieved."
-        goals[k].level_num = row[1]
-        goals[k].node_id = row[4]
-        test.append(str(datetime.now()) + " - Goal achieved. Goal ID: " + str(goals[k].goal_id) + " Level num: " + str(
-                goals[k].level_num) + " Node ID: " + str(goals[k].node_id))
-        #print(test[k])
-        k = k + 1
-        i = i + 1
-
-
-    #Check level l logic (if target model proved)
-    sql = '''SELECT count(s."LEVEL_NUM") FROM public."Req_model" as s JOIN public."Facts" as d 
-                    ON s."MODEL_TYPE" = d."MODEL_TYPE" 
-                    AND s."NODE_TYPE" = d."NODE_TYPE"
-                    AND s."NAME" = d."NAME"
-                    AND s."SRC_ID" = d."FACT_ID"
-                    WHERE s."LEVEL_NUM" = ''' + str(level_num) + ''';'''
-    cur.execute(sql)
-    level_elements_fact = cur.fetchall()
+    level_elements_fact_achieved = cur.fetchall()
+    for row in level_elements_fact_achieved:
+        level_elements_fact_achieved_int = row[0]
     sql = '''SELECT count(s."LEVEL_NUM") FROM public."Req_model" as s 
                     WHERE s."LEVEL_NUM" = ''' + str(level_num) + ''';'''
     cur.execute(sql)
     level_elements_req = cur.fetchall()
-    if (level_elements_req == level_elements_fact) and (num > 0):
-        resolution = str("The model is proved. Complexity: " + str(num) + " Level number: " + str(l) + " Len model:" + str (len(model)))
-        return resolution
-    l = l + 1
-    n = 0
-    for p in range(len(goals)):
-        if (goals[p].goal_desc == "Goal achieved."):
-            n = n + 1
-            num = num + 1
-    if n == len(model):
-        resolution = str("The model is proved. Complexity: " + str(num) + " Elements/Len model:" + str(n) + " / " + str (len(model)))
-    else:
-        resolution = str("The model is not proved. Complexity: " +str(num) + " Elements/Len model:" + str(n) + " / " + str (len(model)))
 
+    if (level_elements_req == level_elements_fact_achieved):
+        resolution = str("The model is proved. Complexity: " + str(num) + " Level number: " + str(level_num) + " Len model:" + str (len(model)))
+    else:
+        resolution = str("The model is not proved. Complexity: " +str(num) + " Elements/Len model:" + str(level_elements_fact_achieved_int) + " / " + str (len(model)))
     return resolution
 
 if __name__ == "__main__":
@@ -237,16 +221,13 @@ if __name__ == "__main__":
     # Read facts
     facts = facts_model()
     #Positive scenario - the One fact
-    #facts.start('Test_one_facts1.csv', model1=[])
+    facts.start('Test_one_facts1.csv', model1=[])
     #Positive scenario
-    facts.start('Test_facts1.csv', model1=[])
+    #facts.start('Test_facts1.csv', model1=[])
     #Wrong nodes scenario
     #facts.start('Deductive_facts_(wrong_nodes)_1.csv', model1=[])
     # Empty nodes scenario
     #facts.start('Deductive_facts_(empty_nodes)_1.csv', model1=[])
-    print(datetime.now(), " - Set of facts has been imported")
-    t1 = float(time.time() * 1000)
-    print(datetime.now(), " - Facts import time: " + str(t1 - t0) + "ms.")
     #Deductive analysis
     t2 = float(time.time() * 1000)
     resolution = deductive_synthesis(base_obj.model, facts.model1,level_num)
