@@ -1,4 +1,4 @@
-# PeerJCS-2021
+# TN_KG_research files:
 1. Computational_cmplexty_v3_(ENG).pdf - Computational complexity research report.
 2. DB_create_script.sql - Database create script for the presented Python scripts (PostgreSQL).
 3. Dataset_1k_hierarchical.zip - Dataset: 1k elements, hierarchical structure, input data for the Inductive synthesis algorithm.
