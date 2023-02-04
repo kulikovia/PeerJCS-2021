@@ -18,3 +18,4 @@
 17. Templates.zip - Archivied templates which are used for the research: Computational_cmplexty_v1_(ENG).pdf
 18. Test_rules_1.txt - Human-readable model structures description (Hierarchical and One-Level)
 19. Test_template_1.csv - Template for model structure which is used by Python models generation scripts
+20. parallel_sparql.py - Phyton script for execution of SPARQL requests in distributed two nodes system in parallel mode
